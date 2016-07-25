@@ -1,6 +1,6 @@
 {
   "name": "graceful-close",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Close node 6+ server gracefully with timeout support",
   "author": {
     "name": "Zlatko Fedor",
@@ -32,8 +32,7 @@
     "coveralls": "babel-node ./node_modules/gulp/bin/gulp.js coveralls",
     "eslint": "node ./node_modules/eslint/bin/eslint.js --ext .js,.jsx ."
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "babel-core": "^6.10.4",
@@ -58,6 +57,5 @@
     "should": "^9.0.2",
     "mocha": "^2.5.3"
   },
-  "peerDependencies": {
-  }
+  "peerDependencies": {}
 }

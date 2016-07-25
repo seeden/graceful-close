@@ -32,7 +32,7 @@ export default function enableGracefulClose(server, userOptions, callback) {
     let timeoutId = setTimeout(() => {
       timeoutId = null;
 
-      for (let connection of connections) {
+      for (const connection of connections) {
         connection.end();
       }
 
@@ -56,7 +56,7 @@ export default function enableGracefulClose(server, userOptions, callback) {
       // add user ability to close his things
       callback(() => {
         process.exit(0);
-      })
+      });
     });
   }
 
