@@ -51,6 +51,7 @@ export default function enableGracefulClose(server, userOptions, callback) {
       // end process
       if (!callback) {
         process.exit(0);
+        return;
       }
 
       // add user ability to close his things
