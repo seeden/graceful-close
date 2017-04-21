@@ -1,7 +1,7 @@
-const defaultOptions = {
-  timeout: 10 * 1000, // 10 seconds HEROKU DEFAULT
-  sigterm: true,
-};
+import debug from 'debug';
+
+const log = debug('graceful');
+const wait = (delay) => new Promise(r => setTimeout(r, delay));
 
 export default function enableGracefulClose(server, userOptions, callback) {
   if (typeof userOptions === 'function') {
@@ -9,7 +9,7 @@ export default function enableGracefulClose(server, userOptions, callback) {
   }
 
   const options = {
-    ...defaultOptions,
+    timeout: 10 * 1000, // 10 seconds HEROKU DEFAULT
     ...userOptions,
   };
 
@@ -22,48 +22,40 @@ export default function enableGracefulClose(server, userOptions, callback) {
   });
 
   function close() {
+    log('Graceful close start');
     if (closing) {
-      callback(new Error('Server closing is already in the progress'));
+      log('Server closing is already in the progress');
       return;
     }
 
     closing = true;
 
-    let timeoutId = setTimeout(() => {
-      timeoutId = null;
-
-      for (const connection of connections) {
-        connection.end();
-      }
-
-      connections.clear();
-    }, options.timeout);
-
     // server can be opened and closed again
-    server.close(() => {
+    log('Closing listening');
+    server.close(async () => {
+      log('Server listening is closed');
       closing = false;
 
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
+      if (connections.size) {
+        await wait(options.timeout);
+
+        for (const connection of connections) {
+          connection.end();
+        }
+
+        connections.clear();
       }
 
       // end process
-      if (!callback) {
-        process.exit(0);
-        return;
+      if (callback) {
+        await callback();
       }
 
-      // add user ability to close his things
-      callback(() => {
-        process.exit(0);
-      });
+      process.exit(0);
     });
   }
 
-  if (options.sigterm) {
-    process.on('SIGTERM', close);
-  }
+  process.on('SIGINT', close);
 
   return close;
 }
