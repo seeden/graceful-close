@@ -1,6 +1,6 @@
 {
   "name": "graceful-close",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Close node 6+ server gracefully with timeout support",
   "author": {
     "name": "Zlatko Fedor",

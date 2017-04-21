@@ -1,7 +1,6 @@
 import debug from 'debug';
 
 const log = debug('graceful');
-const wait = (delay) => new Promise(r => setTimeout(r, delay));
 
 export default function enableGracefulClose(server, userOptions, callback) {
   if (typeof userOptions === 'function') {
@@ -30,21 +29,24 @@ export default function enableGracefulClose(server, userOptions, callback) {
 
     closing = true;
 
-    // server can be opened and closed again
-    log('Closing listening');
-    server.close(async () => {
-      log('Server listening is closed');
-      closing = false;
-
-      if (connections.size) {
-        await wait(options.timeout);
-
+    // without all closed connections close will not call callback
+    if (connections.size) {
+      log('We have keep-alive connections. Waiting');
+      setTimeout(() => {
+        log('Closing all connections');
         for (const connection of connections) {
           connection.end();
         }
 
         connections.clear();
-      }
+      }, options.timeout);
+    }
+
+    // server can be opened and closed again
+    log('Closing listening');
+    server.close(async () => {
+      log('Server listening is closed');
+      closing = false;
 
       // end process
       if (callback) {
