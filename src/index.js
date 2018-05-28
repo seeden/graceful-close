@@ -58,6 +58,7 @@ export default function enableGracefulClose(server, userOptions, callback) {
   }
 
   process.on('SIGINT', close);
+  process.on('SIGTERM', close);
 
   return close;
 }
